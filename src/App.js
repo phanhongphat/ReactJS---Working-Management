@@ -10,6 +10,7 @@ class App extends Component {
     super(props);
     this.state = {
             tasks : [],    // id : unique, name, status
+            DisplayForm : false // biến dùng để show ra TaskForm có ẩn hay hiện
     };
   }
 
@@ -22,7 +23,7 @@ class App extends Component {
     }
   }
 
-  onGenerateData = () =>{        // create data  
+  GenerateData = () => {        // create data  
       var tasks = [ 
           {   
             id : this.generateID(),
@@ -55,10 +56,22 @@ class App extends Component {
         return this.randomID() + this.randomID() + '_' + this.randomID() + '_' + this.randomID() + this.randomID() + '_' + this.randomID();
       }
   
+      MiniForm = () => {
+          this.setState({
+              DisplayForm : !this.state.DisplayForm  // xét status ngược lại,true thành false, false thành true để đóng & mở MiniForm
+          });
+      }
+
+      CloseForm = () => {
+        this.setState ({
+          DisplayForm : false
+        });   // biến dùng để truyền dữ liệu cho button x đóng miniform
+      }
 
   render() {
 
-    var {tasks} = this.state;   // var tasks = this.state.tasks;
+    var {tasks,DisplayForm} = this.state;   // var tasks = this.state.tasks;
+    var elementTaskForm = DisplayForm ? <TaskForm CloseForm = {this.CloseForm}/> : '';       // close or open TaskForm
 
     return (
         <div className="container"> 
@@ -68,20 +81,24 @@ class App extends Component {
             <hr/>
 
             <div className="row">
-              <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4"> 
-                {/* Form Input*/}
-                  <TaskForm
-                   />
+              <div className= { DisplayForm ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4': '' }>  {/*form mini add activities,*/}
+                {/* Form Input*/}                             {/*if biến DisplayForm is true :xuất form 4 cột,false thì đóng*/}
+                  {elementTaskForm}
               </div>
 
-              <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                  <button type="button" className="btn btn-primary">
+             {/*form show activities,if biến DisplayForm is true :xuất form 8 cột,false thì mini form đóng nên sẽ full màn hình là 12 cột*/}
+              <div className= { DisplayForm ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }>
+                  <button 
+                        type="button" 
+                        className="btn btn-primary"
+                        onClick ={this.MiniForm}    //bắt sự kiện cho nút add working,click vào sẽ đóng miniform
+                  >
                     <span className ="fa fa-plus mr-5">  Add Working</span>
                   </button>
                   <button 
                       type="button" 
                       className="btn btn-warning ml-5"
-                      onClick = {this.onGenerateData}
+                      onClick = {this.GenerateData}
                   >
                     Generate Working
                   </button>
