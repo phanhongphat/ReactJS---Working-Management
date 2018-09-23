@@ -26,3 +26,26 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.text-right {
+    float: right;
+    cursor: pointer;
+}
+
+.mr-5{
+  margin-right: 5px;
+}
+
+.mt-5{
+  margin-top: 5px;
+}
+.mt-15{
+  margin-top: 15px;
+}
+
+.ml-5{
+  margin-left:5px;
+}
+.pr-5 {
+    padding-right: 5px;
+}
