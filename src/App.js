@@ -56,7 +56,7 @@ class App extends Component {
         return this.randomID() + this.randomID() + '_' + this.randomID() + '_' + this.randomID() + this.randomID() + '_' + this.randomID();
       }
   
-      MiniForm = () => {
+      MiniForm = () => {    
           this.setState({
               DisplayForm : !this.state.DisplayForm  // xét status ngược lại,true thành false, false thành true để đóng & mở MiniForm
           });
@@ -68,10 +68,20 @@ class App extends Component {
         });   // biến dùng để truyền dữ liệu cho button x đóng miniform
       }
 
+      onSubmit = (data) => {  // nhận dữ liệu từ taskform-con
+        data.id = this.generateID();
+        var {tasks} = this.state ;   // var task = this.state.task
+        tasks.push(data); //push date vào tasks để xuất ra form lớn ở app.js
+        this.setState({
+          tasks : tasks 
+        });
+        localStorage.setItem('tasks' , JSON.stringify(tasks));      
+      }
+
   render() {
 
     var {tasks,DisplayForm} = this.state;   // var tasks = this.state.tasks;
-    var elementTaskForm = DisplayForm ? <TaskForm CloseForm = {this.CloseForm}/> : '';       // close or open TaskForm
+    var elementTaskForm = DisplayForm ? <TaskForm onSubmit = {this.onSubmit} CloseForm = {this.CloseForm}/> : '';       // close or open TaskForm
 
     return (
         <div className="container"> 
