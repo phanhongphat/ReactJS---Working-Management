@@ -78,6 +78,42 @@ class App extends Component {
         localStorage.setItem('tasks' , JSON.stringify(tasks));      
       }
 
+      onUpdateStatus = (id) => {
+        var index = this.findIndex(id); // khai báo index = id để tìm id gán cho status khi thay đổi
+        var { tasks } = this.state;
+        if (index !== -1) {             // khác -1 là tìm thấy index của status
+          tasks[index].status = !tasks[index].status; 
+          this.setState({   
+            tasks : tasks
+          });
+          localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+      }
+
+      findIndex = (id) =>{
+        var { tasks } = this.state; // var tasks = this.state.tasks + lấy lấy danh sách các task trong tasks ra
+        var result = -1;
+        tasks.forEach((task , index) => { // mỗi lần truyền qua forEach sẽ nhận dc task và index
+          if (task.id === id) {
+            result = index;
+          }
+        });
+          return result;
+      }
+
+      onDelete = (id) => {                    // giống hàm onUpdateStatus
+         var index = this.findIndex(id); 
+         var { tasks } = this.state;
+         if (index !== -1) {             
+              tasks.splice(index,1);      // splice(index,1) : xóa index và xóa 1
+              this.setState({   
+                tasks : tasks
+              });
+              localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+            this.CloseForm();
+      }
+
   render() {
 
     var {tasks,DisplayForm} = this.state;   // var tasks = this.state.tasks;
@@ -116,7 +152,11 @@ class App extends Component {
                 
                      <Control />
                 {/*List*/}
-                     <TaskList tasks = {tasks} /> 
+                     <TaskList 
+                           tasks = {tasks} 
+                           onUpdateStatus = { this.onUpdateStatus }
+                           onDelete = { this.onDelete }
+                     /> 
               </div>
             </div>
         </div>
