@@ -6,6 +6,7 @@ class TaskForm extends Component {
   constructor (props){
     super(props);
     this.state = {
+      id :'',
       name : '',
       status : false
     }
@@ -42,12 +43,41 @@ class TaskForm extends Component {
     });
   }
 
+  componentWillMount() {          //lifecylcle 1
+    if (this.props.task){         //khác null
+        this.setState({
+            id : this.props.task.id,        //line 139 app.js task = {taskEditing}
+            name : this.props.task.name,    // nên ở đây là task, đang props
+            status : this.props.task.status
+        });
+        console.log(this.state); 
+    }      
+  }
+
+  componentWillReceiveprops (nextProps){      //lifecycle 2 
+     if (nextProps && nextProps.task){         //khác null
+        this.setState({
+            id : nextProps.task.id,        
+            name : nextProps.task.name,    
+            status : nextProps.task.status
+        });        
+    }  else 
+          if (!nextProps.task){
+            this.setState({
+                id :'',
+                name : '',
+                status : false
+                         });
+    }    
+  }
 
   render() {
+    var { id } = this.state;  //xét id để xuất bảng thêm cv or sửa cv
     return (
              <div className="panel panel-warning">
                     <div className="panel-heading">
-                      <h3 className="panel-title">Add Works
+                      <h3 className="panel-title">
+                          { id !== '' ? 'Updating Work' : 'Adding Work' }
                           <span  
                               className="fa fa-times-circle text-right"
                               onClick = {this.CloseForm}

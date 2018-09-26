@@ -10,7 +10,8 @@ class App extends Component {
     super(props);
     this.state = {
             tasks : [],    // id : unique, name, status
-            DisplayForm : false // biến dùng để show ra TaskForm có ẩn hay hiện
+            DisplayForm : false, // biến dùng để show ra TaskForm có ẩn hay hiện
+            taskEditing : null
     };
   }
 
@@ -56,10 +57,18 @@ class App extends Component {
         return this.randomID() + this.randomID() + '_' + this.randomID() + '_' + this.randomID() + this.randomID() + '_' + this.randomID();
       }
   
-      MiniForm = () => {    
+      MiniForm = () => {   
+        if(this.state.DisplayForm && this.state.taskEditing !== null) {
           this.setState({
-              DisplayForm : !this.state.DisplayForm  // xét status ngược lại,true thành false, false thành true để đóng & mở MiniForm
+              DisplayForm : true,  // xét status ngược lại,true thành false, false thành true để đóng & mở MiniForm
+              taskEditing : null
           });
+      } else {
+          this.setState({
+              DisplayForm : !this.state.DisplayForm,  // xét status ngược lại,true thành false, false thành true để đóng & mở MiniForm
+              taskEditing : null 
+                       });   
+      }
       }
 
       CloseForm = () => {
@@ -69,11 +78,19 @@ class App extends Component {
       }
 
       onSubmit = (data) => {  // nhận dữ liệu từ taskform-con
-        data.id = this.generateID();
         var {tasks} = this.state ;   // var task = this.state.task
-        tasks.push(data); //push date vào tasks để xuất ra form lớn ở app.js
+        if(data.id === ''){               //TH thêm cv
+             data.id = this.generateID();   //gọi generateID rùi push vào data, sau đó lưu trong localStorage
+             tasks.push(data); //push date vào tasks để xuất ra form lớn ở app.js
+        }
+        else { // TH Update + edit cv
+            var index = this.findIndex(data.id);   //tìm index để sửa rùi replace nó trong chuỗi
+            tasks[index] = data;
+        }
+       
         this.setState({
-          tasks : tasks 
+          tasks : tasks ,
+          taskEditing : null
         });
         localStorage.setItem('tasks' , JSON.stringify(tasks));      
       }
@@ -114,10 +131,32 @@ class App extends Component {
             this.CloseForm();
       }
 
+      ShowMiniForm = () =>{
+        this.setState({
+          DisplayForm : true
+        });
+      }
+
+      onUpdate = (id) => {
+         var index = this.findIndex(id);  //tìm index để lấy dc index lưu vào tasks
+         var { tasks } = this.state;      // lấy state danh sách cac1s tasks
+         var taskEditing = tasks[index];
+         this.setState ({
+            taskEditing : taskEditing
+         });
+        this.ShowMiniForm();
+      }
+
   render() {
 
-    var {tasks,DisplayForm} = this.state;   // var tasks = this.state.tasks;
-    var elementTaskForm = DisplayForm ? <TaskForm onSubmit = {this.onSubmit} CloseForm = {this.CloseForm}/> : '';       // close or open TaskForm
+    var { tasks , DisplayForm , taskEditing } = this.state;   // var tasks = this.state.tasks;
+    var elementTaskForm = DisplayForm ? 
+        <TaskForm  
+              task = { taskEditing } 
+              onSubmit = {this.onSubmit} 
+              CloseForm = {this.CloseForm}
+        /> 
+        : '';       // close or open TaskForm
 
     return (
         <div className="container"> 
@@ -156,6 +195,7 @@ class App extends Component {
                            tasks = {tasks} 
                            onUpdateStatus = { this.onUpdateStatus }
                            onDelete = { this.onDelete }
+                           onUpdate = {this.onUpdate}
                      /> 
               </div>
             </div>
