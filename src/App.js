@@ -11,8 +11,13 @@ class App extends Component {
     this.state = {
             tasks : [],    // id : unique, name, status
             DisplayForm : false, // biến dùng để show ra TaskForm có ẩn hay hiện
-            taskEditing : null
-    };
+            taskEditing : null,
+            filter : {
+              name : '',
+              status : -1
+            },
+            keyword : ''
+    }
   }
 
   componentWillMount(){                                   // save tasks in localStorage and take the ID(not change)
@@ -147,9 +152,46 @@ class App extends Component {
         this.ShowMiniForm();
       }
 
+      onFilter = (filterName , filterStatus) => {
+        filterStatus = parseInt(filterStatus,10);
+        this.setState ({
+          filter : {
+            name : filterName.toLowerCase(),
+            status : filterStatus
+          }
+        });
+      }
+
+      onSearch = (keyword) => {
+        this.setState({
+          keyword : keyword
+        });
+      }
+
   render() {
 
-    var { tasks , DisplayForm , taskEditing } = this.state;   // var tasks = this.state.tasks;
+    var { tasks , DisplayForm , taskEditing , filter , keyword } = this.state;   // var tasks = this.state.tasks;
+    if(filter){                                                        // bảng filter nhỏ
+        if(filter.name){                                               
+          tasks = tasks.filter((task) => {
+            return task.name.toLowerCase().indexOf(filter.name) !== -1;    
+            });
+       }
+    }
+        tasks = tasks.filter((task) => {
+          if(filter.status === -1){
+            return task;
+          } else {
+            return task.status === (filter.status === 1 ? true : false)
+          }
+        });                                                           //. 
+
+     if(keyword){                                                     // thanh tool search 
+        tasks = tasks.filter((task) => {
+            return task.name.toLowerCase().indexOf(keyword) !== -1;    
+            });
+     }
+
     var elementTaskForm = DisplayForm ? 
         <TaskForm  
               task = { taskEditing } 
@@ -175,8 +217,8 @@ class App extends Component {
               <div className= { DisplayForm ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }>
                   <button 
                         type="button" 
-                        className="btn btn-primary"
-                        onClick ={this.MiniForm}    //bắt sự kiện cho nút add working,click vào sẽ đóng miniform
+                        className ="btn btn-primary"
+                        onClick   = {this.MiniForm}    //bắt sự kiện cho nút add working,click vào sẽ đóng miniform
                   >
                     <span className ="fa fa-plus mr-5">  Add Working</span>
                   </button>
@@ -189,13 +231,14 @@ class App extends Component {
                   </button>
                 {/* Searching and Sort form*/}
                 
-                     <Control />
+                     <Control onSearch = { this.onSearch }/>
                 {/*List*/}
                      <TaskList 
                            tasks = {tasks} 
                            onUpdateStatus = { this.onUpdateStatus }
-                           onDelete = { this.onDelete }
-                           onUpdate = {this.onUpdate}
+                           onDelete       = { this.onDelete }
+                           onUpdate       = { this.onUpdate }
+                           onFilter       = { this.onFilter }
                      /> 
               </div>
             </div>
